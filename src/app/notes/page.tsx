@@ -1,14 +1,22 @@
+import prisma from "@/lib/db/prisma";
+import { auth } from "@clerk/nextjs";
 import { Metadata } from "next";
 import React from "react";
-
-type Props = {};
 
 export const metadata: Metadata = {
   title: "NoteBrain - Notes",
 };
 
-const NotesPage = (props: Props) => {
-  return <div>Here will be your notes!</div>;
-};
+export default async function NotesPage() {
+  const { userId } = auth();
 
-export default NotesPage;
+  if (!userId) {
+    throw Error("userId undefined!");
+  }
+
+  const allNotes = await prisma.note.findMany({
+    where: { userId: userId },
+  });
+
+  return <div>{JSON.stringify(allNotes)}</div>;
+}
